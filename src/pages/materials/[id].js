@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import dbConnect from "@lib/dbConnect";
-import Material from "../../models/Material";
+import dbConnect from "@db/connect";
+import Material from "@db/models/Material";
 
-const MaterialDetail = ({ material }) => {
+export default function MaterialDetail({ material }) {
   if (!material) {
     return <div>Material nicht gefunden!</div>;
   }
@@ -10,47 +9,38 @@ const MaterialDetail = ({ material }) => {
   return (
     <div>
       <h1>{material.name}</h1>
-      <p>
-        <strong>Menge:</strong> {material.menge} {material.einheit}
-      </p>
-      <p>
-        <strong>Preis:</strong> €{material.preis}
-      </p>
-      <p>
-        <strong>Beschreibung:</strong> {material.beschreibung}
-      </p>
+
       <p>
         <strong>Erstellt am:</strong>{" "}
-        {new Date(material.erstelltAm).toLocaleDateString()}
+        {material.erstelltAm
+          ? new Date(material.erstelltAm).toLocaleDateString()
+          : "Keine Angabe"}
       </p>
       <p>
         <strong>Aktualisiert am:</strong>{" "}
-        {new Date(material.aktualisiertAm).toLocaleDateString()}
+        {material.aktualisiertAm
+          ? new Date(material.aktualisiertAm).toLocaleDateString()
+          : "Keine Angabe"}
       </p>
     </div>
   );
-};
+}
 
 // getServerSideProps ermöglicht es uns, Daten vom Server zu holen, bevor die Seite angezeigt wird
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
-  // Verbindung zur DB herstellen
   await dbConnect();
 
-  // Material mit der gegebenen ID suchen
-  const material = await Material.findById(id);
+  const material = await Material.findById(id).lean(); // Nutze `lean()` für plain JSON-Daten
 
   if (!material) {
     return {
-      notFound: true, // Optional, wenn Material nicht gefunden wird
+      notFound: true,
     };
   }
 
-  // Material-Daten zurückgeben
   return {
-    props: { material: JSON.parse(JSON.stringify(material)) },
+    props: { material }, // Serialisierung erfolgt automatisch
   };
 }
-
-export default MaterialDetail;

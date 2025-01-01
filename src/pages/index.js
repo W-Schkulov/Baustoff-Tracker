@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
-import MaterialList from "../components/MaterialList";
-
+import MaterialForm from "../components/MaterialForm";
+import MaterialList from "@/components/MaterialList";
 const Container = styled.div`
   text-align: center;
   padding: 2rem;
@@ -13,19 +13,11 @@ const Title = styled.h1`
 `;
 
 export default function Home() {
-  const [materials, setMaterials] = useState([]);
-
   return (
     <Container>
       <Title>Handwerker Material Verbrauch</Title>
-      <MaterialList materials={materials} />
-      <button
-        onClick={() =>
-          setMaterials([...materials, { name: "Zement", amount: 10 }])
-        }
-      >
-        Material hinzufügen
-      </button>
+      <MaterialForm />
+      <MaterialList />
     </Container>
   );
 }

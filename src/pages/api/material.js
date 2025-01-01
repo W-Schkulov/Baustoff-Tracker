@@ -1,29 +1,42 @@
-import dbConnect from "@lib/dbConnect";
-import Material from "../../models/Material";
+import databaseConnect from "@db/connect";
+import Material from "@db/models/Material";
 
-export default async function handler(req, res) {
-  await dbConnect();
+export default async function handler(request, response) {
+  await databaseConnect();
 
-  const { method } = req;
+  try {
+    if (request.method === "GET") {
+      const materialList = await Material.find(); // Alle Einträge abrufen
+      return response.status(200).json(materialList);
+    }
 
-  switch (method) {
-    case "POST":
-      try {
-        const material = new Material({
-          name: req.body.name,
-          menge: req.body.menge,
-          einheit: req.body.einheit,
-          preis: req.body.preis,
-          beschreibung: req.body.beschreibung || "",
-        });
-        await material.save();
-        res.status(201).json(material);
-      } catch (error) {
-        res.status(500).json({ message: "Error creating material" });
+    if (request.method === "POST") {
+      const inputData = request.body;
+
+      if (
+        !inputData.name ||
+        !inputData.menge ||
+        !inputData.einheit ||
+        !inputData.preis
+      ) {
+        return response
+          .status(400)
+          .json({ message: "Alle Felder müssen ausgefüllt werden!" });
       }
-      break;
 
-    default:
-      res.status(405).json({ message: `Method ${method} Not Allowed` });
+      const material = await Material.create(inputData);
+      return response
+        .status(201)
+        .json({ message: "Material erfolgreich hinzugefügt!", material });
+    }
+
+    response
+      .status(405)
+      .json({ message: `Method ${request.method} Not Allowed` });
+  } catch (error) {
+    console.error("Fehler beim Verarbeiten der Anfrage:", error);
+    response
+      .status(500)
+      .json({ message: "Serverfehler beim Verarbeiten der Anfrage" });
   }
 }
