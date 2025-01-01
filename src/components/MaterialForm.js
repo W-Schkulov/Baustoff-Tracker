@@ -7,7 +7,7 @@ export default function MaterialForm() {
   const [einheit, setEinheit] = useState("kg");
   const [preis, setPreis] = useState(0);
   const [beschreibung, setBeschreibung] = useState("");
-  const [foto, setFoto] = useState(null); // State für das Bild
+  const [foto, setFoto] = useState(null); 
 
   // Funktion zum Hochladen des Materials
   async function handleSubmit(event) {
@@ -35,20 +35,18 @@ export default function MaterialForm() {
 
       const data = await response.json();
       alert("Material erfolgreich hinzugefügt!");
-      // Formular zurücksetzen
       setName("");
       setMenge(0);
       setEinheit("kg");
       setPreis(0);
       setBeschreibung("");
-      setFoto(null); // Reset für das Bild
+      setFoto(null); 
     } catch (error) {
       console.error("Error while submitting:", error);
       alert("Fehler beim Absenden des Formulars: " + error.message);
     }
   }
 
-  // Funktion zum Setzen des Bildes
   const handleFotoChange = (event) => {
     setFoto(event.target.files[0]);
   };
